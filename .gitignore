@@ -1,0 +1,9 @@
+*.vcxproj
+*.filters
+*.user
+*.sln
+
+.vs/
+Debug/
+mc-mod-installer/
+x64/
