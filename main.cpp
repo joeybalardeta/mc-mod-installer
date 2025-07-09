@@ -1,72 +1,35 @@
-#include <iostream>
 #define NOMINMAX
+
+#include "filesystem.hpp"
+#include "json.hpp"
+
+#include <iostream>
 #include <windows.h>
 #include <string>
 #include <vector>
 #include <sstream>
 #include <cstdio>
-#include <wininet.h>
-#include <algorithm>
-#pragma comment(lib, "wininet.lib")
+#include <fstream>
+
 
 // constants
 const std::string JAVA_INSTALLER_URL = "https://github.com/adoptium/temurin17-binaries/releases/latest/download/OpenJDK17U-jre_x64_windows_hotspot_17.msi";
 const std::string FABRIC_INSTALLER_URL = "https://maven.fabricmc.net/net/fabricmc/fabric-installer/1.0.3/fabric-installer-1.0.3.jar";
-const std::string FABRIC_LOADER_VERSION = "0.14.9"; // Fabric loader version
+const std::string FABRIC_LOADER_VERSION = "0.16.14"; // Fabric loader version
 const std::string MINECRAFT_VERSION = "1.20.1"; // Minecraft version to install Fabric for
 
 // define all functions here to avoid linking issues
 
-// cor functions
-std::vector<std::string> split_path(const std::string& path, char delimiter);
-void create_directory(const std::string& path);
+// core functions
 bool is_java_installed();
 void validate_java_installation();
 bool is_fabric_installed(const std::string& minecraft_dir, const std::string& mcversion, const std::string& loader_version);
 void validate_fabric_installation(const std::string& mcversion, const std::string& loader_version);
-void download_file(const std::string& url, const std::string& output_path);
-std::string safe_getenv(const char* var);
 bool is_version_greater_or_equal(const std::string& installed_version, const std::string& required_version);
 
 // test functions
 void test_all();
 void test_file_download();
-
-// Helper to split a path into its components
-std::vector<std::string> split_path(const std::string& path, char delimiter = '\\') {
-    std::vector<std::string> parts;
-    std::stringstream ss(path);
-    std::string item;
-    while (std::getline(ss, item, delimiter)) {
-        if (!item.empty()) {
-            parts.push_back(item);
-        }
-    }
-    return parts;
-}
-
-// Recursively create directories in a path (Windows API)
-void create_directory(const std::string& path) {
-    std::vector<std::string> parts = split_path(path);
-    std::string current;
-    if (path.size() > 1 && path[1] == ':') {
-        current = parts[0] + "\\";
-        parts.erase(parts.begin());
-    }
-    for (const auto& part : parts) {
-        if (!current.empty() && current.back() != '\\')
-            current += "\\";
-        current += part;
-        if (!CreateDirectoryA(current.c_str(), NULL)) {
-            if (GetLastError() != ERROR_ALREADY_EXISTS) {
-                std::cerr << "Failed to create directory: " << current << std::endl;
-                return;
-            }
-        } else {
-            std::cout << "Created directory: " << current << std::endl;
-        }
-    }
-}
 
 // Check if Java is installed by running 'java -version'
 bool is_java_installed() {
@@ -194,53 +157,6 @@ void validate_fabric_installation(const std::string& mcversion, const std::strin
     }
 }
 
-// File download logic using WinINet
-void download_file(const std::string& url, const std::string& output_path) {
-    HINTERNET hInternet = InternetOpenA("MinecraftModInstaller", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
-    if (!hInternet) {
-        std::cerr << "Failed to initialize WinINet." << std::endl;
-        exit(1);
-    }
-
-    HINTERNET hFile = InternetOpenUrlA(hInternet, url.c_str(), NULL, 0, INTERNET_FLAG_RELOAD, 0);
-    if (!hFile) {
-        std::cerr << "Failed to open URL: " << url << std::endl;
-        InternetCloseHandle(hInternet);
-        exit(1);
-    }
-
-    FILE* file = nullptr;
-    if (fopen_s(&file, output_path.c_str(), "wb") != 0 || !file) {
-        std::cerr << "Failed to open output file: " << output_path << std::endl;
-        InternetCloseHandle(hFile);
-        InternetCloseHandle(hInternet);
-        exit(1);
-    }
-
-    char buffer[4096];
-    DWORD bytesRead = 0;
-    while (InternetReadFile(hFile, buffer, sizeof(buffer), &bytesRead) && bytesRead > 0) {
-        fwrite(buffer, 1, bytesRead, file);
-    }
-
-    fclose(file);
-    InternetCloseHandle(hFile);
-    InternetCloseHandle(hInternet);
-    std::cout << "Downloaded: " << url << " to: " << output_path << std::endl;
-}
-
-// Safe getenv using _dupenv_s
-std::string safe_getenv(const char* var) {
-    char* buffer = nullptr;
-    size_t sz = 0;
-    if (_dupenv_s(&buffer, &sz, var) == 0 && buffer != nullptr) {
-        std::string value(buffer);
-        free(buffer);
-        return value;
-    }
-    return std::string();
-}
-
 // test functions
 
 // test all functions
@@ -273,6 +189,17 @@ int main() {
 
     // check Fabric installation, install if not found
     validate_fabric_installation(MINECRAFT_VERSION, FABRIC_LOADER_VERSION);
+
+    // Add launcher profile for the modded install
+    add_minecraft_launcher_profile(minecraft_dir, modded_install_dir, FABRIC_LOADER_VERSION, MINECRAFT_VERSION, "The Cove - Season 8 (" + MINECRAFT_VERSION + ")");
+
+    // Wait for user to launch modded Minecraft install and close it
+    std::cout << "\n\nNow, launch your modded Minecraft install and close it!" << std::endl;
+    std::cout << "\nThen press enter." << std::endl;
+	std::cin.get();
+
+	// download and unzip the modpack into the modded install
+
 
     std::cout << "Setup script completed." << std::endl;
     return 0;
