@@ -18,7 +18,9 @@ const std::string FABRIC_INSTALLER_URL = "https://maven.fabricmc.net/net/fabricm
 const std::string FABRIC_LOADER_VERSION = "0.16.14"; // Fabric loader version
 const std::string MINECRAFT_VERSION = "1.20.1"; // Minecraft version to install Fabric for
 
-// define all functions here to avoid linking issues
+const std::string MODPACK_URL = "https://www.dropbox.com/scl/fi/a45r7w65czkdnbudbv346/cove-s7-client-mods.zip?rlkey=co7hz5feeup4di0dr61bxi6wx&e=1&st=p59x5oro&dl=1"; // URL to the modpack zip file
+
+// function declarations (to avoid linker errors)
 
 // core functions
 bool is_java_installed();
@@ -26,10 +28,12 @@ void validate_java_installation();
 bool is_fabric_installed(const std::string& minecraft_dir, const std::string& mcversion, const std::string& loader_version);
 void validate_fabric_installation(const std::string& mcversion, const std::string& loader_version);
 bool is_version_greater_or_equal(const std::string& installed_version, const std::string& required_version);
+bool is_modpack_downloaded(const std::string& modpack_zip_path);
+void validate_modpack_installation(const std::string& modpack_url);
 
-// test functions
-void test_all();
-void test_file_download();
+
+
+// function definitions
 
 // Check if Java is installed by running 'java -version'
 bool is_java_installed() {
@@ -157,22 +161,45 @@ void validate_fabric_installation(const std::string& mcversion, const std::strin
     }
 }
 
-// test functions
 
-// test all functions
-void test_all() {
-    std::cout << "Testing all functions..." << std::endl;
-    test_file_download();
+bool is_modpack_downloaded(const std::string& modpack_zip_path) {
+    std::ifstream file(modpack_zip_path, std::ios::binary);
+    if (file) {
+        file.close();
+        std::cout << "Modpack already downloaded at: " << modpack_zip_path << std::endl;
+        return true;
+    } else {
+        std::cout << "Modpack not found at: " << modpack_zip_path << std::endl;
+        return false;
+	}
 }
 
-// test file download function
-void test_file_download() {
-    std::string url = JAVA_INSTALLER_URL;
-    std::string home_dir = safe_getenv("USERPROFILE");
-    std::string output_path = home_dir + "\\Downloads\\OpenJDK17U-jre_x64_windows_hotspot_17.msi";
-    download_file(url, output_path);
-    std::cout << "File downloaded to: " << output_path << std::endl;
+
+void validate_modpack_installation(const std::string& modpack_url) {
+    std::cout << "Downloading and installing modpack..." << std::endl;
+
+	std::string temp_dir = safe_getenv("TEMP");
+	std::string modpack_zip_path = temp_dir + "\\cove-s8-modpack.zip";
+	
+    // Check if the modpack is already downloaded
+    if (!is_modpack_downloaded(modpack_zip_path)) {
+        std::cout << "Modpack not downloaded. Downloading..." << std::endl;
+        download_file(modpack_url, modpack_zip_path);
+	}
+    else {
+		std::cout << "Modpack already downloaded. Skipping download." << std::endl;
+    }
+	// Unzip the modpack into the modded install directory
+	std::string modded_install_dir = safe_getenv("USERPROFILE") + "\\Games\\Minecraft\\modded-install\\mods";
+    std::string unzip_cmd = "powershell -Command \"Expand-Archive -Path '" + modpack_zip_path + "' -DestinationPath '" + modded_install_dir + "' -Force\"";
+    int result = system(unzip_cmd.c_str());
+    if (result != 0) {
+        std::cerr << "Failed to unzip the modpack. Please unzip manually." << std::endl;
+        exit(1);
+    }
+	std::cout << "Modpack unzipped successfully into: " << modded_install_dir << std::endl;	
 }
+
 
 // main function to run the setup script
 int main() {
@@ -199,6 +226,7 @@ int main() {
 	std::cin.get();
 
 	// download and unzip the modpack into the modded install
+	validate_modpack_installation(MODPACK_URL);
 
 
     std::cout << "Setup script completed." << std::endl;
