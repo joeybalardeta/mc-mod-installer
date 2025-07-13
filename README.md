@@ -123,6 +123,8 @@ mc-mod-installer/
 - Ensure sufficient disk space for the modpack download and extraction
 
 ## License
+MIT License
+
 Copyright (c) 2025 Joey Balardeta
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
