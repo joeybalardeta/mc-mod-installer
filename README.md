@@ -40,18 +40,20 @@ A comprehensive C++ automation tool designed to completely set up a modded Minec
 
 ## Configuration
 
-The installer is pre-configured for "The Cove - Season 8" but can be customized by modifying the constants in `constants.hpp`:
-// Java Configuration
-const std::string JAVA_INSTALLER_URL = "https://download.oracle.com/java/22/archive/jdk-22.0.2_windows-x64_bin.msi";
-const std::string REQUIRED_JAVA_VERSION = "21"; // Minimum Java version required
+The installer is pre-configured for "The Cove - Season 8" but can be customized by modifying the constants in `constants.hpp`.
 
-// Fabric Configuration  
-const std::string FABRIC_INSTALLER_URL = "https://maven.fabricmc.net/net/fabricmc/fabric-installer/1.0.3/fabric-installer-1.0.3.jar";
-const std::string FABRIC_LOADER_VERSION = "0.16.14"; // Target Fabric loader version
+### Java Configuration
+- Oracle JDK 22 installer from official download archive
+- Minimum required Java version: 21
 
-// Modpack Configuration
-const std::string MINECRAFT_VERSION = "1.20.1"; // Target Minecraft version
-const std::string MODPACK_URL = "https://www.dropbox.com/scl/fi/5g7ygqza18345os79bpvx/cove-s8-client-mods-full.zip?rlkey=fhjxukhk969lbpee8j2dxcr4p&st=uyidgl06&dl=1"; // Modpack download URL
+### Fabric Configuration  
+- Fabric installer version: 1.0.3 from official Maven repository
+- Target Fabric loader version: 0.16.14
+
+### Modpack Configuration
+- Target Minecraft version: 1.20.1
+- Modpack source: "The Cove - Season 8" client mods package from Dropbox
+
 ## How to Use
 
 ### Prerequisites
@@ -86,6 +88,7 @@ const std::string MODPACK_URL = "https://www.dropbox.com/scl/fi/5g7ygqza18345os7
    - Enjoy your modded Minecraft experience!
 
 ## Project Structure
+```bash
 mc-mod-installer/
 ├── main.cpp              # Main application logic and orchestration
 ├── constants.hpp         # Configuration constants
@@ -93,6 +96,8 @@ mc-mod-installer/
 ├── filesystem.cpp        # File operations, downloads, and utility functions
 ├── json.hpp              # JSON library for launcher profile management
 └── README.md             # This file
+```
+
 ## Technical Requirements
 
 - **Compiler:** C++14 compatible compiler (Visual Studio 2017+ recommended)
