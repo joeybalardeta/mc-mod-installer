@@ -76,14 +76,9 @@ The installer is pre-configured for "The Cove - Season 8" but can be customized 
      - Install Fabric loader for Minecraft 1.20.1
      - Create the modded installation directories
      - Set up a Minecraft launcher profile
+     - Download and install the modpack
 
-3. **Complete Setup:**
-   - When prompted, launch Minecraft using the new profile
-   - Run Minecraft once and then close it (this initializes the modded environment)
-   - Press Enter in the installer to continue
-   - The installer will download and install the modpack
-
-4. **Launch & Play:**
+3. **Launch & Play:**
    - Use the "The Cove - Season 8 (1.20.1)" profile in the Minecraft launcher
    - Enjoy your modded Minecraft experience!
 
