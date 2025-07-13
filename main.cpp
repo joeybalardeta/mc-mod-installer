@@ -494,13 +494,13 @@ int main() {
     // Add launcher profile for the modded install
     add_minecraft_launcher_profile(minecraft_dir, modded_install_dir, FABRIC_LOADER_VERSION, MINECRAFT_VERSION, "The Cove - Season 8 (" + MINECRAFT_VERSION + ")");
 
-	// Wait for user to launch modded Minecraft install and close it (can skip this step, mods folder can be there before install initialization)
+    // Wait for user to launch modded Minecraft install and close it (can skip this step, mods folder can be there before install initialization)
     // std::cout << "\n\nNow, launch your modded Minecraft install and close it!" << std::endl;
     // std::cout << "\nThen press enter." << std::endl;
-	// std::cin.get();
-
-	// download and unzip the modpack into the modded install
-	validate_modpack_installation(MODPACK_URL);
+    // std::cin.get();
+    
+    // download and unzip the modpack into the modded install
+    validate_modpack_installation(MODPACK_URL);
 
 
     std::cout << "Setup script completed." << std::endl;
